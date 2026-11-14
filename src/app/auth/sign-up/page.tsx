@@ -1,5 +1,5 @@
-import { AuthForm } from "../auth-form";
+import { LocalizedAuthForm } from "../localized-auth-form";
 
 export default function SignUpPage() {
-  return <AuthForm mode="sign-up" />;
+  return <LocalizedAuthForm mode="sign-up" />;
 }

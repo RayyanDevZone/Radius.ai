@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 
-export function SignOutButton() {
+export function SignOutButton({ label }: { label: string }) {
   const router = useRouter();
   return (
     <button
@@ -14,7 +14,7 @@ export function SignOutButton() {
       }}
       className="self-start rounded border px-3 py-2"
     >
-      Sign out
+      {label}
     </button>
   );
 }

@@ -1,5 +1,5 @@
-import { AuthForm } from "../auth-form";
+import { LocalizedAuthForm } from "../localized-auth-form";
 
 export default function SignInPage() {
-  return <AuthForm mode="sign-in" />;
+  return <LocalizedAuthForm mode="sign-in" />;
 }
