@@ -42,30 +42,39 @@ same form again.
 Start the app with `npm run dev` and open http://localhost:3000. Use a private
 window (or sign out) between owners.
 
+Dashboard layout: the Radius.ai logo and a menu button are on the left of the
+top bar. The green **person icon** on the right opens your account details
+(name, email, business, role) and **Sign out**. The left drawer menu (opened
+and closed with the menu button) has Dashboard (empty for now), **Stores**
+(store cards), **Products**, **Shops** and **Vehicles** (empty for now), and
+**Employees** (owners only; lists the business's employees). On each of these,
+owners see an "Add …" button on the right of the title and count. It shows "Coming soon"
+for now.
+
 1. **Logged-out users can't reach the dashboard.** In a private window, open
    `/dashboard` and then `/dashboard/anything`. Both land on `/login`.
-2. **Owner 1, by email.** Sign in as `asha.owner@radius-test.dev`. The
-   dashboard header shows **Asha Traders**, the role is **Owner**, and Stores
-   lists Main Depot and North Warehouse only.
+2. **Owner 1, by email.** Sign in as `asha.owner@radius-test.dev`, then
+   open **Stores** in the menu. It shows "2 stores" and two cards, Main Depot and North Warehouse. The person icon shows
+   business **Asha Traders** and role **Owner**.
 3. **Signed-in users skip login.** While signed in, open `/login` and
    `/signup`. Both go straight to `/dashboard`.
-4. **Sign out.** Tap **Sign out**. You land on `/login`, and opening
-   `/dashboard` again sends you back to `/login`.
-5. **Owner 2, by phone.** Sign in with `+91 98000 00002`. The header shows
-   **Bharat Distributors**, and Stores lists only Central Godown, with nothing
-   from Asha Traders.
+4. **Sign out.** Open the person icon and tap **Sign out**. You land on
+   `/login`, and opening `/dashboard` again sends you back to `/login`.
+5. **Owner 2, by phone.** Sign in with `98000 00002` (with or without +91).
+   **Stores** shows only Central Godown, and the person icon shows **Bharat
+   Distributors**. Nothing from Asha Traders appears.
 6. **Wrong details look the same.** Try a wrong password, an unregistered
-   phone (`+91 98111 11111`) and an unknown email. Each shows the same
+   phone (`98111 11111`) and an unknown email. Each shows the same
    "Incorrect email/phone number or password." message.
 7. **New owner sign-up.** Sign up with the Chetan details above. You land on
-   the dashboard for **Chetan Supplies** with no stores, then add a store.
-   Adding a second store with the same name is rejected.
-8. **Employee view.** Sign in as `suresh.employee@radius-test.dev`. The
-   header shows **Mehta Distribution Co**, the role is **Employee**, and the
-   stores are listed but there's no "Add store" form. Phone login is for
-   owners only, so employees use their email.
-9. **Language.** Choose हिन्दी on `/language`. The login, sign-up and dashboard
-   text switches to Hindi.
+   the dashboard for **Chetan Supplies**, and **Stores** says "No stores yet."
+8. **Employee view.** Sign in as `suresh.employee@radius-test.dev`.
+   **Stores** shows Mehta Distribution Co's two stores, the person icon shows
+   role **Employee**, and there are no "Add …" buttons. Phone login is for owners only, so employees use their email.
+9. **Drawer.** On a computer, the menu button collapses and reopens the left
+   drawer. On a phone, the drawer starts closed and slides over the page.
+10. **Language.** Choose हिन्दी on `/language`. The login, sign-up and
+    dashboard text switches to Hindi.
 
 ## Re-testing sign-up with the same details
 

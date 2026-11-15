@@ -1,106 +1,63 @@
 import { Suspense } from "react";
-import { eq } from "drizzle-orm";
-import { getPageContext } from "@/lib/auth-context";
-import { db } from "@/db";
-import { authOrganization, authUser } from "@/db/auth-schema";
+import { getContext } from "@/lib/auth-context";
+import { getStoreSelection } from "@/lib/selected-store";
 import { getI18n } from "@/i18n/server";
-import { listStores } from "@/lib/stores-data";
-import { SignOutButton } from "./sign-out-button";
-import { AddStoreForm } from "./add-store-form";
+import { EmptyState, Icon, SectionHeader } from "../_components/section";
+import { SectionSkeleton } from "../_components/section-skeleton";
 
-async function DashboardContent() {
-  // Redirects to /login or /onboarding if there's no valid tenant context.
-  const ctx = await getPageContext();
-  const { locale, t } = await getI18n();
-
-  // Every lookup is keyed by ids from the server-side context.
-  const [[org], [user], storeList] = await Promise.all([
-    db.select({ name: authOrganization.name }).from(authOrganization).where(eq(authOrganization.id, ctx.orgId)).limit(1),
-    db.select({ name: authUser.name, email: authUser.email }).from(authUser).where(eq(authUser.id, ctx.userId)).limit(1),
-    listStores(),
-  ]);
-
+async function StoresContent() {
+  // Tenant and role come from the session (getContext()).
+  const [ctx, { stores, selected }, { t }] = await Promise.all([getContext(), getStoreSelection(), getI18n()]);
   const d = t.dashboard;
-  const roleLabel = d.roles[ctx.role];
 
   return (
-    <div lang={locale} className="flex min-h-full flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-foreground/10 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
-          <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.15em] text-muted">{d.business}</p>
-            <p className="truncate font-serif text-2xl leading-tight" data-testid="business-name">
-              {org?.name}
-            </p>
-          </div>
-          <SignOutButton label={d.signOut} />
-        </div>
-      </header>
+    <section aria-labelledby="stores-title" className="flex flex-col gap-5">
+      <SectionHeader
+        id="stores-title"
+        title={d.stores.title}
+        count={stores.length}
+        countLabel={d.stores}
+        addLabel={d.stores.add}
+        comingSoon={d.comingSoon}
+        canAdd={ctx.role === "owner"}
+      />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
-        <h1 className="text-3xl sm:text-4xl">{d.title}</h1>
-
-        <section className="rounded-2xl border border-foreground/10 bg-white/70 p-5 shadow-sm">
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs uppercase tracking-[0.15em] text-muted">{d.signedInAs}</dt>
-              <dd className="mt-1 text-lg font-medium">{user?.name}</dd>
-              <dd className="truncate text-sm text-muted">{user?.email}</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.15em] text-muted">{d.role}</dt>
-              <dd className="mt-1">
-                <span className="inline-flex items-center rounded-full border border-accent-strong bg-accent/60 px-3 py-1 text-sm font-medium">
-                  {roleLabel}
+      {stores.length === 0 ? (
+        <EmptyState title={d.stores.empty} icon={<Icon name="store" className="h-7 w-7" />} />
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" data-testid="store-list">
+          {stores.map((s) => (
+            <li
+              key={s.id}
+              aria-current={s.id === selected?.id ? "true" : undefined}
+              className="flex flex-col gap-3 rounded-2xl border border-accent-strong/60 bg-white/70 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md aria-[current=true]:border-foreground aria-[current=true]:ring-2 aria-[current=true]:ring-accent-strong/60"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span aria-hidden className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/70 text-brand">
+                  <Icon name="store" />
                 </span>
-              </dd>
-            </div>
-          </dl>
-        </section>
-
-        <section aria-labelledby="stores-title" className="rounded-2xl border border-foreground/10 bg-white/70 p-5 shadow-sm">
-          <div className="mb-4 flex items-baseline justify-between gap-3">
-            <h2 id="stores-title" className="text-2xl">
-              {d.stores.title}
-            </h2>
-            <span className="text-sm text-muted">{storeList.length}</span>
-          </div>
-          {storeList.length === 0 ? (
-            <p className="mb-4 text-sm text-muted">
-              {d.stores.empty} {ctx.role === "owner" && d.stores.emptyOwner}
-            </p>
-          ) : (
-            <ul className="mb-4 flex flex-col gap-2" data-testid="store-list">
-              {storeList.map((s) => (
-                <li key={s.id} className="rounded-xl border border-accent-strong/60 bg-background/70 px-4 py-3">
-                  <p className="font-medium">{s.name}</p>
-                  {s.address && <p className="text-sm text-muted">{s.address}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
-          {ctx.role === "owner" && <AddStoreForm t={d.stores} />}
-        </section>
-
-        <p className="rounded-2xl border border-dashed border-foreground/20 p-5 text-sm text-muted">{d.comingSoon}</p>
-      </main>
-    </div>
+                {s.id === selected?.id && (
+                  <span className="rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background" data-testid="store-selected-badge">
+                    {d.storePicker.selected}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-medium">{s.name}</p>
+                {s.address && <p className="mt-1 text-sm leading-6 text-muted">{s.address}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
-function DashboardSkeleton() {
+export default function StoresPage() {
   return (
-    <div aria-busy className="mx-auto w-full max-w-3xl animate-pulse px-4 py-6">
-      <div className="h-8 w-48 rounded bg-foreground/10" />
-      <div className="mt-6 h-32 rounded-2xl bg-foreground/5" />
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardContent />
+    <Suspense fallback={<SectionSkeleton />}>
+      <StoresContent />
     </Suspense>
   );
 }

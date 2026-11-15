@@ -6,6 +6,7 @@
   --accent: #cfe9d6; /* light green */
   --accent-strong: #8fcf9f;
   --muted: #5b6f62;
+  --brand: #2f7d52; /* mid green for icons/text; 4.7:1 on --background */
 }
 
 @theme inline {
@@ -14,6 +15,7 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-muted: var(--muted);
+  --color-brand: var(--brand);
   --font-sans: var(--font-inter), var(--font-noto-devanagari), system-ui, sans-serif;
   --font-serif: var(--font-instrument-serif), var(--font-tiro-hindi), Georgia, serif;
 }
