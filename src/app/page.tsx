@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { getI18n } from "@/i18n/server";
+import { getDictionary } from "@/i18n/dictionaries";
 import { DbStatusLogger } from "./db-status-logger";
 
 const WORD = "Radius";
@@ -10,11 +9,12 @@ const AFTER_HEADING = HEADING_START + WORD.length * LETTER_STAGGER + 0.3;
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
-async function Hero() {
-  const { locale, t } = await getI18n();
+// The landing page comes before the language picker, so it is always English.
+const t = getDictionary("en");
 
+function Hero() {
   return (
-    <section lang={locale} className="relative flex max-w-2xl flex-col items-center gap-7 text-center">
+    <section lang="en" className="relative flex max-w-2xl flex-col items-center gap-7 text-center">
       <span
         className="animate-fade-up rounded-full border border-accent-strong bg-accent/60 px-4 py-1 text-xs font-medium uppercase tracking-[0.2em]"
         style={delay(0)}
@@ -72,10 +72,7 @@ export default function Home() {
         className="animate-breathe pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] rounded-full bg-accent blur-3xl"
       />
 
-      {/* Hero reads the language cookie, so it renders at request time. */}
-      <Suspense fallback={null}>
-        <Hero />
-      </Suspense>
+      <Hero />
 
       <DbStatusLogger />
     </main>
