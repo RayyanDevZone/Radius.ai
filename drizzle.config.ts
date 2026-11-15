@@ -1,10 +1,11 @@
 import { loadEnvConfig } from "@next/env";
 import { defineConfig } from "drizzle-kit";
+import { withVerifiedSsl } from "./src/lib/db-url";
 
 // Load .env.local the same way Next.js does.
 loadEnvConfig(process.cwd());
 
-const url = process.env.DATABASE_URL_UNPOOLED;
+const url = withVerifiedSsl(process.env.DATABASE_URL_UNPOOLED);
 if (!url) throw new Error("DATABASE_URL_UNPOOLED is not set (see .env.local)");
 
 export default defineConfig({

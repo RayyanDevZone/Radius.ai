@@ -20,7 +20,14 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const AUTH_URL = process.env.NEON_AUTH_BASE_URL?.replace(/\/$/, "");
-const DB_URL = process.env.DATABASE_URL_UNPOOLED;
+// Same as src/lib/db-url.ts: state pg's current strict SSL mode explicitly.
+const DB_URL = (() => {
+  const raw = process.env.DATABASE_URL_UNPOOLED;
+  if (!raw) return raw;
+  const u = new URL(raw);
+  if (["prefer", "require", "verify-ca"].includes(u.searchParams.get("sslmode"))) u.searchParams.set("sslmode", "verify-full");
+  return u.toString();
+})();
 if (!AUTH_URL || !DB_URL) {
   console.error("NEON_AUTH_BASE_URL and DATABASE_URL_UNPOOLED must be set (run with --env-file=.env.local).");
   process.exit(1);
