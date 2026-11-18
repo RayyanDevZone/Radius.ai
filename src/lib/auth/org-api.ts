@@ -19,6 +19,8 @@ type OrganizationApi = {
     slug: string;
   }>;
   setActive(body: { organizationId: string | null }): AuthApiResult<{ id: string } | null>;
+  inviteMember(body: { email: string; role: "member"; organizationId: string }): AuthApiResult<{ id: string }>;
+  cancelInvitation(body: { invitationId: string }): AuthApiResult<unknown>;
 };
 
 export const organizationApi = (auth as unknown as { organization: OrganizationApi }).organization;

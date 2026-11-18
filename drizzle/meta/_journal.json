@@ -8,6 +8,41 @@
       "when": 1794762486890,
       "tag": "0000_organization_profile_and_stores",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794925047038,
+      "tag": "0001_products_and_shops",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794928060796,
+      "tag": "0002_vehicles",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794928223426,
+      "tag": "0003_employee_profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794939385284,
+      "tag": "0004_product_units",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794940845586,
+      "tag": "0005_product_unit_optional",
+      "breakpoints": true
     }
   ]
 }

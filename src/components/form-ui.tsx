@@ -9,7 +9,7 @@ import { useState, type ComponentProps, type ReactNode } from "react";
 
 const delay = (s: number) => ({ animationDelay: `${s}s` });
 
-const inputClass =
+export const inputClass =
   "h-12 w-full rounded-xl border border-accent-strong/80 bg-background/80 px-4 text-base text-foreground placeholder:text-muted/60 transition-all duration-200 hover:border-foreground/40 focus:border-foreground focus:bg-background focus:outline-none focus:ring-4 focus:ring-accent/70 aria-invalid:border-red-600";
 
 /** Centered, phone-first card used by /login, /signup and /onboarding. */
@@ -118,7 +118,8 @@ export function FieldGroup({ legend, children }: { legend: string; children: Rea
 type FieldProps = { label: string; hint?: string; error?: string | null; name: string; trailing?: ReactNode } & ComponentProps<"input">;
 
 export function Field({ label, hint, error, name, trailing, className, ...input }: FieldProps) {
-  const id = `field-${name}`;
+  // Pass `id` when the same form can be on the page twice (e.g. Add + Edit popups).
+  const id = input.id ?? `field-${name}`;
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
     <div className="flex flex-col gap-1.5">
@@ -164,7 +165,7 @@ export function PasswordField({
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-pressed={visible}
-          aria-controls={`field-${props.name}`}
+          aria-controls={props.id ?? `field-${props.name}`}
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-accent-strong"
         >
           {visible ? hideLabel : showLabel}

@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/server";
 import { db } from "@/db";
-import { organizationProfile } from "@/db/schema";
+import { employeeProfile, organizationProfile } from "@/db/schema";
 import { authMember, authUser } from "@/db/auth-schema";
 import { isValidPhone, normalizePhone } from "@/lib/validation";
 
@@ -18,8 +18,9 @@ const INVALID = "INVALID_EMAIL_OR_PASSWORD";
  * - Contains "@": treated as an email.
  * - Otherwise: normalized like a business phone, then mapped to the email of
  *   the OWNER of the business whose organization_profile.business_phone
- *   matches. The mapping never leaves the server, so owners' emails are never
- *   exposed to the browser.
+ *   matches, or else of the EMPLOYEE whose employee_profile.phone matches.
+ *   The mapping never leaves the server, so emails are never exposed to the
+ *   browser.
  *
  * auth.signIn.email() here sets the session cookie on this action's response.
  * The next request (the client then calls activateOrganization()) sees it.
@@ -37,7 +38,7 @@ export async function signInWithIdentifier(raw: { identifier: string; password: 
   let email: string | null = isEmail ? identifier : null;
   if (!isEmail) {
     const phone = normalizePhone(identifier);
-    email = isValidPhone(phone) ? await ownerEmailForPhone(phone) : null;
+    email = isValidPhone(phone) ? await emailForPhone(phone) : null;
   }
 
   try {
@@ -53,6 +54,27 @@ export async function signInWithIdentifier(raw: { identifier: string; password: 
     console.error("[signInWithIdentifier] sign-in request failed", err);
     return { ok: false, code: "UNKNOWN" };
   }
+}
+
+/** Login email for a (normalized) phone: an owner's business phone, else an employee's phone. */
+async function emailForPhone(phone: string): Promise<string | null> {
+  return (await ownerEmailForPhone(phone)) ?? (await employeeEmailForPhone(phone));
+}
+
+/** Placeholder email of the employee with this phone (see src/lib/employee-actions.ts), or null. */
+async function employeeEmailForPhone(phone: string): Promise<string | null> {
+  const [row] = await db
+    .select({ email: authUser.email })
+    .from(employeeProfile)
+    // Still a member of the business the profile belongs to.
+    .innerJoin(
+      authMember,
+      and(eq(authMember.userId, employeeProfile.userId), eq(authMember.organizationId, employeeProfile.organizationId)),
+    )
+    .innerJoin(authUser, eq(authUser.id, employeeProfile.userId))
+    .where(eq(employeeProfile.phone, phone))
+    .limit(1);
+  return row?.email ?? null;
 }
 
 /** Email of the owner of the business with this (normalized) phone, or null. */

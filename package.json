@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "drizzle-kit migrate",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:update": "drizzle-kit generate && drizzle-kit migrate",
     "db:check": "drizzle-kit check",
     "db:seed-test": "node --env-file=.env.local scripts/seed-test-data.mjs"
   },

@@ -5,7 +5,7 @@ import { and, asc, count, eq, gt, inArray, isNull, ne, notInArray, sql } from "d
 import { auth } from "@/lib/auth/server";
 import { activeOrganizationIdOf, organizationApi } from "@/lib/auth/org-api";
 import { db } from "@/db";
-import { organizationProfile, stores } from "@/db/schema";
+import { employeeProfile, organizationProfile, stores } from "@/db/schema";
 import { authMember, authOrganization, authUser } from "@/db/auth-schema";
 import { normalizeBusinessInput, validateBusinessInput, type BusinessField } from "@/lib/validation";
 
@@ -79,12 +79,16 @@ export async function setupBusiness(raw: { businessName: string; phone: string }
   try {
     // Phone numbers are unique (owners sign in with them). Check before
     // creating anything. The unique index catches races at insert time.
-    const [taken] = await db
-      .select({ id: organizationProfile.organizationId })
-      .from(organizationProfile)
-      .where(eq(organizationProfile.businessPhone, input.phone))
-      .limit(1);
-    if (taken) throw new PhoneTakenError();
+    const [[taken], [takenByEmployee]] = await Promise.all([
+      db
+        .select({ id: organizationProfile.organizationId })
+        .from(organizationProfile)
+        .where(eq(organizationProfile.businessPhone, input.phone))
+        .limit(1),
+      // Employees sign in with their phone too (see src/lib/employee-actions.ts).
+      db.select({ id: employeeProfile.userId }).from(employeeProfile).where(eq(employeeProfile.phone, input.phone)).limit(1),
+    ]);
+    if (taken || takenByEmployee) throw new PhoneTakenError();
 
     const { data: org, error } = await organizationApi.create({
       name: input.businessName,

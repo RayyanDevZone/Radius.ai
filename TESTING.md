@@ -70,11 +70,29 @@ for now.
    the dashboard for **Chetan Supplies**, and **Stores** says "No stores yet."
 8. **Employee view.** Sign in as `suresh.employee@radius-test.dev`.
    **Stores** shows Mehta Distribution Co's two stores, the person icon shows
-   role **Employee**, and there are no "Add …" buttons. Phone login is for owners only, so employees use their email.
+   role **Employee**, and there are no "Add …" buttons. Suresh is an older
+   email-only account, so he signs in with his email.
 9. **Drawer.** On a computer, the menu button collapses and reopens the left
    drawer. On a phone, the drawer starts closed and slides over the page.
 10. **Language.** Choose हिन्दी on `/language`. The login, sign-up and
     dashboard text switches to Hindi.
+11. **Add an employee (phone login).** As `ravi.owner@radius-test.dev`, open
+    **Employees** → **Add employee**: name, phone `98000 00020`, designation
+    `Driver`, a password. The card shows the phone and "Driver". Sign out and
+    sign in with `98000 00020` + that password: you're an **Employee** of
+    Mehta Distribution Co. Adding `98000 00002` (an owner's phone) or the same
+    number again shows "already used to sign in".
+12. **Import from CSV / Excel.** As `asha.owner@radius-test.dev`, open
+    **Products** and tap the upload icon (left of **+**). Tap **Download
+    template**, add a few rows in Excel and save as `.xlsx` (or keep `.csv`),
+    then **Choose file**. **Match your columns** lists each field with a
+    dropdown of the sheet's columns (pre-filled where the names match; rename
+    a header, e.g. "Size unit" → "Packing", and pick it by hand). **Continue**
+    says "N rows ready" → **Import N**, and the products appear. Put `abc` in a Price cell and choose the file again: it
+    lists "Row 3: Enter a valid price…" and nothing is imported. The same
+    works on **Shops**, **Vehicles** (a number that already exists is
+    reported, nothing is saved) and **Employees** (each row becomes a
+    phone + password login; at most 50 per file).
 
 ## Re-testing sign-up with the same details
 

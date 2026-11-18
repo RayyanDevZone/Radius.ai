@@ -125,3 +125,11 @@ h3 {
     animation: none;
   }
 }
+
+/* Tailwind v4 resets buttons to cursor: default; restore the pointer app-wide. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}

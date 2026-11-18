@@ -10,10 +10,11 @@ import type { Dictionary } from "@/i18n/dictionaries";
 type Props = {
   lang: string;
   t: Dictionary["dashboard"];
-  business: string;
   /** Shows owner-only menu items. UI only; pages check the role on the server. */
   isOwner: boolean;
-  /** Store dropdown shown under the business card (rendered by the layout). */
+  /** Business name, shown in the top-bar account pill. */
+  business: string;
+  /** Store dropdown at the top of the drawer (rendered by the layout). */
   storePicker?: ReactNode;
   children: ReactNode;
 };
@@ -56,7 +57,6 @@ export function DashboardShell({ lang, t, business, isOwner, storePicker, childr
   // Open/closed classes per breakpoint, spelled out literally for Tailwind.
   // Using both flags (not `isOpen`) keeps the server render correct on desktop.
   const expandedOnly = `${mobileOpen ? "block" : "hidden"} ${desktopOpen ? "lg:block" : "lg:hidden"}`;
-  const collapsedOnly = `${mobileOpen ? "hidden" : "flex"} ${desktopOpen ? "lg:hidden" : "lg:flex"}`;
   // Labels stay readable to screen readers when the rail hides them.
   const labelClass = `whitespace-nowrap ${mobileOpen ? "" : "sr-only"} ${desktopOpen ? "lg:not-sr-only" : "lg:sr-only"}`;
   // px-3.5 centres the 20px icon in the 48px rail, so icons don't move when the panel opens.
@@ -112,7 +112,7 @@ export function DashboardShell({ lang, t, business, isOwner, storePicker, childr
             Radius<span className="text-shimmer italic">.ai</span>
           </Link>
         </div>
-        <UserMenu label={t.profile.title} active={pathname === "/dashboard/profile"} />
+        <UserMenu label={t.profile.title} business={business} active={pathname === "/dashboard/profile"} />
       </header>
 
       <div className="relative flex flex-1">
@@ -147,23 +147,8 @@ export function DashboardShell({ lang, t, business, isOwner, storePicker, childr
               desktopOpen ? "lg:w-64" : "lg:w-16",
             ].join(" ")}
           >
-            {/* Business: full card when open, initial badge when closed */}
-            <div className={`mb-2 rounded-xl bg-accent/40 px-3 py-3 ${expandedOnly}`}>
-              <p className="whitespace-nowrap text-xs uppercase tracking-[0.15em] text-muted">{t.business}</p>
-              <p className="truncate font-medium" data-testid="drawer-business-name">
-                {business}
-              </p>
-            </div>
-            <span
-              aria-hidden
-              title={business}
-              className={`mb-2 h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/40 font-serif text-xl ${collapsedOnly}`}
-            >
-              {business.trim().charAt(0).toUpperCase() || "?"}
-            </span>
-
-            {/* Store dropdown, under the business card */}
-            <div className={expandedOnly}>{storePicker}</div>
+            {/* Store dropdown at the top of the drawer (business name lives in the top bar) */}
+            <div className={`mb-1 ${expandedOnly}`}>{storePicker}</div>
 
             <nav className="flex flex-col gap-1">
               {nav.map((item) =>

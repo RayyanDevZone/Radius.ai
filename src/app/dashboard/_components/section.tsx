@@ -3,7 +3,7 @@ import { AddButton } from "./add-button";
 
 /**
  * Shared header for list pages (Stores, Products, Shops):
- *   Title  [count]                                  [+ Add …]
+ *   Title  [count]                                  [import] [+]
  * The Add button is shown to owners only.
  */
 export function SectionHeader({
@@ -14,6 +14,8 @@ export function SectionHeader({
   addLabel,
   comingSoon,
   canAdd,
+  addAction,
+  importAction,
 }: {
   id: string;
   title: string;
@@ -22,6 +24,10 @@ export function SectionHeader({
   addLabel: string;
   comingSoon: string;
   canAdd: boolean;
+  /** Real add flow (e.g. a dialog trigger). Without it, the button shows "Coming soon". */
+  addAction?: ReactNode;
+  /** CSV / XLSX import trigger (ImportDialog), shown left of the + button. */
+  importAction?: ReactNode;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -33,7 +39,12 @@ export function SectionHeader({
           {count} {count === 1 ? countLabel.one : countLabel.other}
         </span>
       </div>
-      {canAdd && <AddButton label={addLabel} comingSoon={comingSoon} />}
+      {canAdd && (
+        <div className="flex items-center gap-2">
+          {importAction}
+          {addAction ?? <AddButton label={addLabel} comingSoon={comingSoon} />}
+        </div>
+      )}
     </div>
   );
 }
