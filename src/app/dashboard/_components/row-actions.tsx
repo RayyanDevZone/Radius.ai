@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useId, useImperativeHandle, useRef, useState, type ReactNode } from "react";
+import { startTransition, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { FormError } from "@/components/form-ui";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { DeleteResult } from "@/lib/row-action-result";
@@ -24,29 +24,39 @@ export function RowActions({
   name,
   onDelete,
   renderEdit,
+  extraItems = [],
 }: {
   labels: Labels;
   manage: Manage;
   /** Shown in the confirmation and success messages. */
   name: string;
-  onDelete: () => Promise<DeleteResult>;
+  /** Omit to hide Delete. */
+  onDelete?: () => Promise<DeleteResult>;
   /** Omit to hide Edit. `close` must be called when the popup closes. */
   renderEdit?: (close: () => void) => ReactNode;
+  /** More actions, listed before Edit (e.g. "Mark delivered"). */
+  extraItems?: RowMenuItem[];
 }) {
   const [editing, setEditing] = useState(false);
-  const deleteRef = useRef<DeleteDialogHandle>(null);
+  // The Delete popup is mounted only when asked for, so long lists stay light.
+  const [deleting, setDeleting] = useState(false);
 
   return (
     <>
       <RowMenu
         label={`${labels.menu}: ${name}`}
         items={[
+          ...extraItems,
           ...(renderEdit ? [{ key: "edit", label: labels.edit, icon: editIcon, onSelect: () => setEditing(true) }] : []),
-          { key: "delete", label: labels.delete, icon: trashIcon, danger: true, onSelect: () => deleteRef.current?.open() },
+          ...(onDelete
+            ? [{ key: "delete", label: labels.delete, icon: trashIcon, danger: true, onSelect: () => setDeleting(true) }]
+            : []),
         ]}
       />
       {editing && renderEdit?.(() => setEditing(false))}
-      <DeleteDialog ref={deleteRef} labels={labels} manage={manage} name={name} onDelete={onDelete} />
+      {onDelete && deleting && (
+        <DeleteDialog labels={labels} manage={manage} name={name} onDelete={onDelete} onClosed={() => setDeleting(false)} />
+      )}
     </>
   );
 }
@@ -55,7 +65,8 @@ export function RowActions({
 /* Menu                                                               */
 /* ------------------------------------------------------------------ */
 
-type MenuItem = { key: string; label: string; icon: ReactNode; danger?: boolean; onSelect: () => void };
+export type RowMenuItem = { key: string; label: string; icon: ReactNode; danger?: boolean; onSelect: () => void };
+type MenuItem = RowMenuItem;
 
 const MENU_WIDTH = 176; // w-44
 const ITEM_HEIGHT = 40; // h-10
@@ -185,20 +196,19 @@ function RowMenu({ label, items }: { label: string; items: MenuItem[] }) {
 /* Delete: confirm → success message                                  */
 /* ------------------------------------------------------------------ */
 
-type DeleteDialogHandle = { open: () => void };
-
 function DeleteDialog({
-  ref,
   labels,
   manage,
   name,
   onDelete,
+  onClosed,
 }: {
-  ref: React.Ref<DeleteDialogHandle>;
   labels: Labels;
   manage: Manage;
   name: string;
   onDelete: () => Promise<DeleteResult>;
+  /** Runs after the popup closes, so the parent can unmount it. */
+  onClosed: () => void;
 }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -208,14 +218,10 @@ function DeleteDialog({
   const titleId = useId();
   const bodyId = useId();
 
-  // Exposed to the menu: open the confirmation fresh each time.
-  useImperativeHandle(ref, () => ({
-    open() {
-      setPhase("confirm");
-      setError(null);
-      dialogRef.current?.showModal();
-    },
-  }));
+  // Mounted on demand: open as soon as it mounts.
+  useEffect(() => {
+    if (!dialogRef.current?.open) dialogRef.current?.showModal();
+  }, []);
 
   function close() {
     if (pending) return;
@@ -228,7 +234,16 @@ function DeleteDialog({
     try {
       const result = await onDelete();
       if (result.ok) setPhase("done");
-      else setError(result.error === "not_found" ? manage.notFound : result.error === "forbidden" ? labels.forbidden : labels.failed);
+      else
+        setError(
+          result.error === "not_found"
+            ? manage.notFound
+            : result.error === "forbidden"
+              ? labels.forbidden
+              : result.error === "in_use"
+                ? labels.inUse
+                : labels.failed,
+        );
     } catch {
       setError(labels.failed);
     } finally {
@@ -249,7 +264,10 @@ function DeleteDialog({
         if (e.target === e.currentTarget) close();
       }}
       // The row is gone once deleted; reload the list when the success message closes.
-      onClose={() => done && startTransition(() => router.refresh())}
+      onClose={() => {
+        if (done) startTransition(() => router.refresh());
+        onClosed();
+      }}
       className="m-auto w-[min(24rem,calc(100vw-2rem))] rounded-3xl border border-foreground/10 bg-background p-0 text-left text-foreground shadow-[0_24px_60px_-20px_rgba(31,58,43,0.5)] transition duration-200 ease-out starting:open:translate-y-4 starting:open:opacity-0 backdrop:bg-foreground/40 backdrop:backdrop-blur-sm"
     >
       <div className="flex flex-col items-center gap-3 p-6 text-center sm:p-7" role={done ? "status" : undefined}>

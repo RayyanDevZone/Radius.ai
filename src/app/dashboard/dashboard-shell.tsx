@@ -7,9 +7,14 @@ import { UserMenu } from "./user-menu";
 import { Icon, type IconName } from "./_components/section";
 import type { Dictionary } from "@/i18n/dictionaries";
 
+export type ShellLabels = Pick<Dictionary["dashboard"], "nav" | "openMenu" | "closeMenu" | "soon"> & {
+  profile: Pick<Dictionary["dashboard"]["profile"], "title">;
+};
+
 type Props = {
   lang: string;
-  t: Dictionary["dashboard"];
+  /** Only the strings the frame uses (the full dashboard dictionary is large). */
+  t: ShellLabels;
   /** Shows owner-only menu items. UI only; pages check the role on the server. */
   isOwner: boolean;
   /** Business name, shown in the top-bar account pill. */
@@ -65,6 +70,10 @@ export function DashboardShell({ lang, t, business, isOwner, storePicker, childr
 
   const nav: { href: string; label: string; icon: IconName; ready: boolean }[] = [
     { href: "/dashboard", label: t.nav.dashboard, icon: "grid", ready: true },
+    { href: "/dashboard/deliveries", label: t.nav.deliveries, icon: "route", ready: true },
+    // Owner-only page (business money).
+    ...(isOwner ? [{ href: "/dashboard/payments", label: t.nav.payments, icon: "wallet" as const, ready: true }] : []),
+    { href: "/dashboard/stock", label: t.nav.stock, icon: "layers", ready: true },
     { href: "/dashboard/products", label: t.nav.products, icon: "box", ready: true },
     { href: "/dashboard/shops", label: t.nav.shops, icon: "shop", ready: true },
     { href: "/dashboard/vehicles", label: t.nav.vehicles, icon: "truck", ready: true },

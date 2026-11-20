@@ -45,8 +45,9 @@ window (or sign out) between owners.
 Dashboard layout: the Radius.ai logo and a menu button are on the left of the
 top bar. The green **person icon** on the right opens your account details
 (name, email, business, role) and **Sign out**. The left drawer menu (opened
-and closed with the menu button) has Dashboard (empty for now), **Stores**
-(store cards), **Products**, **Shops** and **Vehicles** (empty for now), and
+and closed with the menu button) has Dashboard, **Deliveries**, **Payments**
+(owners only), **Stock**, **Stores** (store cards), **Products**, **Shops**,
+**Vehicles**, and
 **Employees** (owners only; lists the business's employees). On each of these,
 owners see an "Add …" button on the right of the title and count. It shows "Coming soon"
 for now.
@@ -93,6 +94,28 @@ for now.
     works on **Shops**, **Vehicles** (a number that already exists is
     reported, nothing is saved) and **Employees** (each row becomes a
     phone + password login; at most 50 per file).
+13. **Dashboard, deliveries and payments.** Run `npm run db:seed-demo` once
+    (after `npm run db:seed-test`). It gives Mehta Distribution Co about 60
+    days of deliveries, payments and stock; it does nothing if that business
+    already has deliveries. Sign in as `ravi.owner@radius-test.dev`:
+    - **Dashboard** shows overview cards, Today, a 30-day sales chart (hover a
+      column; "Show as table" lists the days), top products and shops,
+      outstanding payments, shops gone quiet, vehicles, employees and low
+      stock. The switch at the top flips between the side-menu store and
+      **All stores**.
+    - **Deliveries** → **+**: pick a shop, add items (the price fills in from
+      the product), assign Suresh. In the row's ⋮ menu, **Out for delivery**,
+      then **Mark delivered** with "Payment collected now". The amount shows
+      under the total, **Stock** goes down by the quantities, and
+      **Payments** lists the payment.
+    - **Payments**: shop balances (delivered − paid, overdue after 30 days)
+      and **Record payment**. Deleting a shop that has deliveries says it's
+      in use.
+    - Sign in as Suresh: the home page is **My day**, **Deliveries** lists
+      only his deliveries and he can't cancel them, **Payments** isn't in
+      the menu, and **Stock** is read-only.
+    - A new business (e.g. Chetan) sees **Get your business set up** with
+      six steps; it disappears once each has at least one record.
 
 ## Re-testing sign-up with the same details
 

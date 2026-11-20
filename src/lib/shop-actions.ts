@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { shops } from "@/db/schema";
 import { AuthContextError, requireOwner } from "@/lib/auth-context";
 import { normalizeShopInput, validateShopInput, type ShopField } from "@/lib/shops";
-import { isUuid, type DeleteResult } from "@/lib/row-action-result";
+import { isForeignKeyViolation, isUuid, type DeleteResult } from "@/lib/row-action-result";
 
 export type AddShopResult =
   | { ok: true }
@@ -90,6 +90,8 @@ export async function deleteShop(id: string): Promise<DeleteResult> {
       .returning({ id: shops.id });
     return rows.length ? { ok: true } : { ok: false, error: "not_found" };
   } catch (err) {
+    // Shops with deliveries or payments are kept: they're part of the books.
+    if (isForeignKeyViolation(err)) return { ok: false, error: "in_use" };
     console.error("deleteShop failed", err);
     return { ok: false, error: "failed" };
   }

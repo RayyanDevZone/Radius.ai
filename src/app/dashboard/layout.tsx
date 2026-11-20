@@ -23,7 +23,13 @@ async function Frame({ children }: { children: React.ReactNode }) {
   return (
     <DashboardShell
       lang={locale}
-      t={t.dashboard}
+      t={{
+        nav: t.dashboard.nav,
+        openMenu: t.dashboard.openMenu,
+        closeMenu: t.dashboard.closeMenu,
+        soon: t.dashboard.soon,
+        profile: { title: t.dashboard.profile.title },
+      }}
       business={org?.name ?? ""}
       isOwner={ctx.role === "owner"}
       storePicker={

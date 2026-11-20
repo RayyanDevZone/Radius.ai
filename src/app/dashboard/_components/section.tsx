@@ -74,7 +74,21 @@ export function Icon({ name, className = "h-5 w-5" }: { name: IconName; classNam
   );
 }
 
-export type IconName = "grid" | "box" | "shop" | "truck" | "users" | "store" | "settings";
+export type IconName =
+  | "grid"
+  | "box"
+  | "shop"
+  | "truck"
+  | "users"
+  | "store"
+  | "settings"
+  | "route"
+  | "wallet"
+  | "layers"
+  | "check"
+  | "alert"
+  | "phone"
+  | "trend";
 
 const ICONS: Record<IconName, ReactNode> = {
   grid: (
@@ -86,6 +100,26 @@ const ICONS: Record<IconName, ReactNode> = {
     </>
   ),
   box: <path d="M4 8l8-4 8 4v8l-8 4-8-4V8zm0 0l8 4 8-4M12 12v8" />,
+  // A delivery: from a pin, along a route, to a shop.
+  route: (
+    <>
+      <circle cx="6" cy="6" r="2.5" />
+      <path d="M6 8.5v3a3 3 0 003 3h6a3 3 0 013 3v.5" />
+      <path d="M15.5 19.5L18 17l2.5 2.5" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M4 7.5A2.5 2.5 0 016.5 5H18v3" />
+      <path d="M4 7.5V17a2 2 0 002 2h14V8H6.5A2.5 2.5 0 014 7.5z" />
+      <circle cx="16" cy="13.5" r="1.2" />
+    </>
+  ),
+  layers: <path d="M12 4l8 4-8 4-8-4 8-4zM4 12l8 4 8-4M4 16l8 4 8-4" />,
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  alert: <path d="M12 4l9 16H3L12 4zM12 10v4M12 17h.01" />,
+  phone: <path d="M6.5 4h3l1.5 4-2 1.5a10 10 0 005.5 5.5l1.5-2 4 1.5v3a2 2 0 01-2 2A16 16 0 014.5 6a2 2 0 012-2z" />,
+  trend: <path d="M4 17l5-5 4 4 7-8M15 8h5v5" />,
   shop: <path d="M4 10l1.5-5h13L20 10M4 10v9h16v-9M4 10h16M9 19v-5h6v5" />,
   store: <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />,
   truck: (

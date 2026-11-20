@@ -43,6 +43,13 @@
       "when": 1794940845586,
       "tag": "0005_product_unit_optional",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794983273355,
+      "tag": "0006_deliveries_payments_stock",
+      "breakpoints": true
     }
   ]
 }

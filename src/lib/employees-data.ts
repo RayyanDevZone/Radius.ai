@@ -9,6 +9,8 @@ import { sortAlphabetically } from "@/lib/sort";
 
 export type EmployeeRow = {
   id: string;
+  /** neon_auth user id (deliveries are assigned to this). */
+  userId: string;
   name: string;
   /** Login phone for employees added in the app; null for older email-only accounts. */
   phone: string | null;
@@ -28,6 +30,7 @@ export async function listEmployees(): Promise<EmployeeRow[]> {
   const rows = await db
     .select({
       id: authMember.id,
+      userId: authMember.userId,
       name: authUser.name,
       email: authUser.email,
       phone: employeeProfile.phone,
